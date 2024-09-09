@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Euclid satellite 3D</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Carica la versione non modulare di Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <!-- Carica il GLTFLoader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.135.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Carica OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.135.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        50000
+      );
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Load star texture and create background
+      const loader_bkg = new THREE.TextureLoader();
+      loader_bkg.load("2k_stars_milky_way.jpg", function (texture) {
+        const starGeometry = new THREE.SphereGeometry(10000, 64, 64);
+        const starMaterial = new THREE.MeshBasicMaterial({
+          map: texture,
+          side: THREE.BackSide, // This ensures the texture is visible from the inside
+        });
+        const starMesh = new THREE.Mesh(starGeometry, starMaterial);
+        scene.add(starMesh);
+      });
+
+      // Aggiungi OrbitControls per muovere la telecamera
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      const loader = new THREE.GLTFLoader();
+      let model;
+
+      loader.load(
+        "models/euclid.glb",
+        function (gltf) {
+          scene.add(gltf.scene);
+          gltf.scene.position.set(0, -1, 0);
+          model = gltf.scene;
+          model.rotation.x = 3.14 / 6;
+          model.rotation.y = 3.14;
+          model.rotation.z = -3.14 / 6;
+        },
+        undefined,
+        function (error) {
+          console.error(error);
+        }
+      );
+
+      const light_x = new THREE.DirectionalLight(0xffffff, 1);
+      light_x.position.set(1, 0, 0).normalize();
+      scene.add(light_x);
+
+      const light_y = new THREE.DirectionalLight(0xffffff, 1);
+      light_y.position.set(0, 1, 0).normalize();
+      scene.add(light_y);
+
+      const light_x_neg = new THREE.DirectionalLight(0xffffff, 0.75);
+      light_x_neg.position.set(-1, 0, 0).normalize();
+      scene.add(light_x_neg);
+
+      const light_y_neg = new THREE.DirectionalLight(0xffffff, 0.5);
+      light_y_neg.position.set(0, -1, 0).normalize();
+      scene.add(light_y_neg);
+
+      const light_yz = new THREE.DirectionalLight(0xffffff, 1);
+      light_yz.position.set(0, 1, 1).normalize();
+      scene.add(light_yz);
+
+      const light_yz_neg = new THREE.DirectionalLight(0xffffff, 0.5);
+      light_yz_neg.position.set(0, -1, -1).normalize();
+      scene.add(light_yz_neg);
+
+      const light_xyz = new THREE.DirectionalLight(0xffffff, 2);
+      light_xyz.position.set(1, 1, 1).normalize();
+      scene.add(light_xyz);
+
+      camera.position.z = 1000;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update(); // Aggiorna i controlli ogni frame
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Adjust camera and renderer on window resize
+      window.addEventListener("resize", function () {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      });
+    </script>
+  </body>
+</html>
