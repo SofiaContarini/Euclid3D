@@ -80,22 +80,6 @@
           model.rotation.y = 3.14;
           model.rotation.z = -3.14 / 6;
 
-          // Effetto di sfumatura per l'apparizione del modello
-          new TWEEN.Tween({ opacity: 0 })
-            .to({ opacity: 1 }, 10000) // Durata della sfumatura in millisecondi
-            .onUpdate(function () {
-              if (model) {
-                model.traverse(
-                  function (child) {
-                    if (child.isMesh) {
-                      child.material.opacity = this.opacity;
-                    }
-                  }.bind(this)
-                );
-              }
-            })
-            .start();
-
           // Ritarda la scomparsa della scritta di caricamento
           setTimeout(function () {
             document.getElementById("loadingScreen").style.display = "none";
